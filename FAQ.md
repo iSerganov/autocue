@@ -9,25 +9,46 @@ author: Matthias C. Hormann (Moonbase59)
 <!-- ToC begin -->
 <a name="toc"></a>
 
-- [Table of Contents](#table-of-contents)
-- [How to avoid long station startup time?](#how-to-avoid-long-station-startup-time)
-- [How to assure jingles are not cut off?](#how-to-assure-jingles-are-not-cut-off)
-- [How to ensure pre-recorded shows or podcasts aren’t cut off early?](#how-to-ensure-pre-recorded-shows-or-podcasts-arent-cut-off-early)
-- [How to pre-process more than one file at a time ("mass tagging")?](#how-to-pre-process-more-than-one-file-at-a-time-mass-tagging)
-- [What tagging software to use?](#what-tagging-software-to-use)
-- [Can I use `cue_file` to replaygain my files?](#can-i-use-cue_file-to-replaygain-my-files)
-- [Can I use `cue_file` to _manually_ add/overwrite tags when pre-processing?](#can-i-use-cue_file-to-manually-addoverwrite-tags-when-pre-processing)
-- [How to make transitions _tighter_, i.e. overlay earlier?](#how-to-make-transitions-tighter-ie-overlay-earlier)
-- [How to make transitions _longer_, i.e. overlay later and keep every bit of a song ending?](#how-to-make-transitions-longer-ie-overlay-later-and-keep-every-bit-of-a-song-ending)
-- [Can I completely _disable_ the "sustained endings" feature?](#can-i-completely-disable-the-sustained-endings-feature)
-- [Can I completely _disable_ the "longtail" feature?](#can-i-completely-disable-the-longtail-feature)
-- [How to ensure Autocue doesn’t mess with Ad Insertion files?](#how-to-ensure-autocue-doesnt-mess-with-ad-insertion-files)
-- [How to ensure Autocue doesn’t try to process video files?](#how-to-ensure-autocue-doesnt-try-to-process-video-files)
-- [Why should I use `check_autocue_setup`, and what does it do?](#why-should-i-use-check_autocue_setup-and-what-does-it-do)
-- [What are good first steps to use Autocue in my own Liquidsoap script?](#what-are-good-first-steps-to-use-autocue-in-my-own-liquidsoap-script)
-- [What will happen when I switch to the upcoming Liquidsoap 2.3.0?](#what-will-happen-when-i-switch-to-the-upcoming-liquidsoap-230)
-- [What can I do if some files or a remote playlist simply _don’t play?_](#what-can-i-do-if-some-files-or-a-remote-playlist-simply-dont-play)
-- [What exactly is `liq_cue_file` for, and should I use it?](#what-exactly-is-liq_cue_file-for-and-should-i-use-it)
+- [FAQ – Frequently Asked Questions](#faq--frequently-asked-questions)
+  - [Table of Contents ⇧](#table-of-contents)
+  - [How to avoid long station startup time? ⇧](#how-to-avoid-long-station-startup-time)
+    - [AzuraCast](#azuracast)
+    - [Liquidsoap](#liquidsoap)
+  - [How to assure jingles are not cut off? ⇧](#how-to-assure-jingles-are-not-cut-off)
+    - [AzuraCast](#azuracast-1)
+    - [Liquidsoap](#liquidsoap-1)
+    - [Tagging](#tagging)
+  - [How to ensure pre-recorded shows or podcasts aren’t cut off early? ⇧](#how-to-ensure-pre-recorded-shows-or-podcasts-arent-cut-off-early)
+    - [Pre-processing](#pre-processing)
+    - [Liquidsoap](#liquidsoap-2)
+    - [Tagging](#tagging-1)
+  - [How to pre-process more than one file at a time ("mass tagging")? ⇧](#how-to-pre-process-more-than-one-file-at-a-time-mass-tagging)
+  - [What tagging software to use? ⇧](#what-tagging-software-to-use)
+    - [Tagging software I trust and use](#tagging-software-i-trust-and-use)
+    - [Recommendation](#recommendation)
+  - [Can I use `cue_file` to replaygain my files? ⇧](#can-i-use-cue_file-to-replaygain-my-files)
+  - [Can I use `cue_file` to _manually_ add/overwrite tags when pre-processing? ⇧](#can-i-use-cue_file-to-manually-addoverwrite-tags-when-pre-processing)
+      - [Example: Adding fade-in and fade-out, using `echo` and `stdin`](#example-adding-fade-in-and-fade-out-using-echo-and-stdin)
+      - [Example: using a JSON file `fades.json`](#example-using-a-json-file-fadesjson)
+  - [How to make transitions _tighter_, i.e. overlay earlier? ⇧](#how-to-make-transitions-tighter-ie-overlay-earlier)
+  - [How to make transitions _longer_, i.e. overlay later and keep every bit of a song ending? ⇧](#how-to-make-transitions-longer-ie-overlay-later-and-keep-every-bit-of-a-song-ending)
+  - [Can I completely _disable_ the "sustained endings" feature? ⇧](#can-i-completely-disable-the-sustained-endings-feature)
+  - [Can I completely _disable_ the "longtail" feature? ⇧](#can-i-completely-disable-the-longtail-feature)
+  - [How to ensure Autocue doesn’t mess with Ad Insertion files? ⇧](#how-to-ensure-autocue-doesnt-mess-with-ad-insertion-files)
+    - [Liquidsoap](#liquidsoap-3)
+    - [Tagging](#tagging-2)
+  - [How to ensure Autocue doesn’t try to process video files? ⇧](#how-to-ensure-autocue-doesnt-try-to-process-video-files)
+    - [Liquidsoap](#liquidsoap-4)
+    - [Tagging](#tagging-3)
+  - [Why should I use `check_autocue_setup`, and what does it do? ⇧](#why-should-i-use-check_autocue_setup-and-what-does-it-do)
+  - [What are good first steps to use Autocue in my own Liquidsoap script? ⇧](#what-are-good-first-steps-to-use-autocue-in-my-own-liquidsoap-script)
+  - [What will happen when I switch to the upcoming Liquidsoap 2.3.0? ⇧](#what-will-happen-when-i-switch-to-the-upcoming-liquidsoap-230)
+  - [What can I do if some files or a remote playlist simply _don’t play?_ ⇧](#what-can-i-do-if-some-files-or-a-remote-playlist-simply-dont-play)
+  - [What exactly is `liq_cue_file` for, and should I use it? ⇧](#what-exactly-is-liq_cue_file-for-and-should-i-use-it)
+    - [What does that mean for me?](#what-does-that-mean-for-me)
+      - [Normal operation](#normal-operation)
+      - [Fast-changing news, time announcements, etc.](#fast-changing-news-time-announcements-etc)
+      - [Large video files and others you don’t want to autocue](#large-video-files-and-others-you-dont-want-to-autocue)
 <!-- Generated by gh-toc, https://moonbase59.github.io/gh-toc/ -->
 <!-- ToC end -->
 
@@ -283,9 +304,9 @@ So _always_ use it, _after_ your settings and _before_ a possible `enable_autocu
 - set its metadata priority: `settings.autocue.metadata.priority := 10`
 - set the preferred autocue implementation: `settings.autocue.preferred := "cue_file"`
 - set the correct "amplify behaviour": `settings.autocue.amplify_behavior := "keep"`
-- set the default cross duration to your specified fade-out duration: `settings.autocue.target_cross_duration := settings.autocue.cue_file.fade_out()`. This is done to avoid problems when your default fade-out is different from Liquidsoap’s default cross duration of `3.0` seconds. The result is logged:
+- set the default cross duration to your specified fade-out duration: `settings.fade.out.duration := settings.autocue.cue_file.fade_out()`. This is done to avoid problems when your default fade-out is different from Liquidsoap’s default cross duration of `3.0` seconds. The result is logged:
   ```
-  2024/06/21 06:46:51 [autocue.cue_file:2] Setting `settings.autocue.target_cross_duration` to 2.5 s, from `settings.autocue.cue_file.fade_out`.
+  2024/06/21 06:46:51 [autocue.cue_file:2] Setting `settings.fade.out.duration` to 2.5 s, from `settings.autocue.cue_file.fade_out`.
   ```
 - If you set `print=true`, the results will also be shown on the console. This is practical when programming, so you don’t have to find the log and look it up.
 - If you set `shutdown=true`, your Liquidsoap script will shut down if an error occurs. Most of the time, _you should set this_, because the results are unspecified or you can get a lot of errors if the versions of `autocue.cue_file.liq` and `cue_file` don’t match.
