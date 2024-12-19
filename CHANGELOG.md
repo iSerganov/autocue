@@ -1,5 +1,10 @@
 # autocue changelog
 
+### 2024-12-19 - v4.2.0
+
+- Made `autocue` compatible with Liquidsoap 2.3.0
+- Changed frame duration from 100ms to 20ms
+
 ### 2024-08-05 - v4.1.1
 
 - Fix situation where supplied JSON data could still overwrite `cue_file` results even if a file’s `liq_cue_file` tag was set to `true`, meaning the `cue_file` results should be preferred in any case.
