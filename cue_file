@@ -560,7 +560,7 @@ def analyse(
 
     measure = []
     # Extract time "t", momentary (last 400ms) loudness "M" and "I" integrated loudness
-    # from ebur128 filter. Measured every 20ms.
+    # from ebur128 filter. Measured every 100ms.
     # With some file types, like MP3, M can become "nan" (not-a-number),
     # which is a valid float in Python. Usually happens on very silent parts.
     # We convert these to float("-inf") for comparability in silence detection.
@@ -584,8 +584,8 @@ def analyse(
 
     # get actual duration from last PTS (Presentation Time Stamp)
     # This is the last frame, so the total duration is its PTS + frame length
-    # In Liquidsoap 2.3.0 frame duration was dropped to 0.02s
-    duration = measure[end - 1][0] + 0.02
+    # (100ms)
+    duration = measure[end - 1][0] + 0.1
 
     # get integrated song loudness from last frame, so we can calculate liq_amplify
     # (the "ReplayGain") from it (difference to desired loudness target)
@@ -670,7 +670,7 @@ def analyse(
             end = i + 1
             # eprint(f"Found cue-out: {end}, {cue_out_time}")
             break
-    # cue out PAST the current frame (20ms) -- no, reverse that
+    # cue out PAST the current frame (100ms) -- no, reverse that
     cue_out_time = max(cue_out_time, duration - cue_out_time)
 
     # Adjust cue-out and "end" point if we're working with blank detection.
@@ -678,8 +678,8 @@ def analyse(
     # early.
     blank_skipped = False
     if blankskip:
-        # cue out PAST the current frame (20ms) -- no, reverse that
-        # cue_out_time_blank = cue_out_time_blank + 0.02
+        # cue out PAST the current frame (100ms) -- no, reverse that
+        # cue_out_time_blank = cue_out_time_blank + 0.1
         # eprint(f"cue-out blank: {cue_out_time_blank}, cue-out: {cue_out_time}")
         if 0.0 < cue_out_time_blank < cue_out_time:
             cue_out_time = cue_out_time_blank
