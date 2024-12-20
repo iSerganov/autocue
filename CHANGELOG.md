@@ -3,7 +3,6 @@
 ### 2024-12-19 - v4.2.0
 
 - Made `autocue` compatible with Liquidsoap 2.3.0
-- Changed frame duration from 100ms to 20ms
 
 ### 2024-08-05 - v4.1.1
 
