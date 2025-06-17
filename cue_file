@@ -95,7 +95,7 @@ import textwrap
 
 def eprint(*args, **kwargs):
     """Print to stderr, nicely."""
-    print(*args, file=sys.stderr, **kwargs)
+    print(*args, file=sys.stdout, **kwargs)
 
 
 # see if we have Mutagen and import it if available
@@ -347,7 +347,7 @@ def read_tags(
             filename,
         ],
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        # stderr=subprocess.STDOUT,
         check=True,
         text=True).stdout
 
