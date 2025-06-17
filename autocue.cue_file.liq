@@ -51,6 +51,7 @@
 #                           - true = cue_file results override metadata
 # 2024-08-05 - Moonbase59 - v4.1.1 Sync with cue_file version
 # 2024-12-19 - iSerganov  - v4.2.0 Liquidsoap 2.3.0 compatibility
+# 2025-06-16 - iSerganov  - v4.2.1 Add `enforce_start_time` tag to enforce the start time of the track
 
 # Lots of debugging output for AzuraCast in this, will be removed eventually.
 
@@ -64,7 +65,7 @@ let settings.autocue.cue_file.version =
   settings.make(
     description=
       "Software version of autocue.cue_file. Should coincide with `cue_file`.",
-    "4.2.0"
+    "4.2.1"
   )
 
 # Internal only! Not a user setting.

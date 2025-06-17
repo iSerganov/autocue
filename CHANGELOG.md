@@ -1,5 +1,9 @@
 # autocue changelog
 
+### 2025-06-16 - v4.2.1
+
+- Add `enforce_start_time` tag to enforce the start time of the track
+
 ### 2024-12-19 - v4.2.0
 
 - Made `autocue` compatible with Liquidsoap 2.3.0
