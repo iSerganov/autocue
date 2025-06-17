@@ -1250,11 +1250,11 @@ if args.force or not skip_analysis:
 else:
     result = add_missing(tags_found, args.target, args.blankskip, args.noclip)
 
-eprint(f"CUE_FILE found tags: {tags_found}")
+eprint(f"CUE_FILE found json tags: {tags_json}")
 # a custom logic to enforce the start time of the track
 # this is used to ensure that the track starts at a specific time
-if enforce_start_time in tags_found:
-    parsed_datetime = datetime.fromisoformat(tags_found[enforce_start_time])
+if enforce_start_time in tags_json:
+    parsed_datetime = datetime.fromisoformat(tags_json[enforce_start_time])
     now = datetime.now()
     diff = now - parsed_datetime
     eprint(f"Passed since requested start time: {diff.total_seconds()}, Parsed Enforce Start Time: {parsed_datetime}, Current time: {now}")
