@@ -76,11 +76,10 @@
 # Some collaborative work with RM-FM (@RM-FM): Sustained ending analysis.
 
 __author__ = 'Matthias C. Hormann'
-__version__ = '4.2.0'
+__version__ = '4.2.1'
 
 import os
 import sys
-import tempfile
 import subprocess
 import argparse
 import json
@@ -859,8 +858,6 @@ def write_tags(filename, tags={}, replaygain=False):
 
     # Only write if "safe" file type and file is writable.
     if filename.suffix.casefold() in safe_ext and os.access(filename, os.W_OK):
-        # This doesn’t work cross-device!
-        # temp_file_handle, temp = tempfile.mkstemp(prefix="cue_file.", suffix=filename.suffix)
         # So we use the same folder, to be able to do an atomic move.
         temp = filename.with_suffix('.tmp' + filename.suffix)
         # eprint(temp)
