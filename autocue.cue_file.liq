@@ -665,10 +665,10 @@ def cue_file(~request_metadata, ~file_metadata, filename) =
         if time_to_skip() >= duration then
           log(level=3, label=label, "Time to skip is greater than duration, skipping...")
           time_to_skip := time_to_skip() - duration
-          result := list.add(("liq_cue_in", string.float(decimal_places=2, duration)), result)
+          result := list.add(("liq_cue_in", string.float(decimal_places=2, duration)), result())
         else
           log(level=3, label=label, "Time to skip is less than duration, setting liq_cue_in to: #{time_to_skip()}")
-          result := list.add(("liq_cue_in", string.float(decimal_places=2, time_to_skip())), result)
+          result := list.add(("liq_cue_in", string.float(decimal_places=2, time_to_skip())), result())
           time_to_skip := 0.0
         end
       end
