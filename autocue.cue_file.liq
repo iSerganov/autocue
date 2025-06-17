@@ -661,7 +661,6 @@ def cue_file(~request_metadata, ~file_metadata, filename) =
       # Check if we need to enforce the start time of the track
       if time_to_skip() > 0.0 then
         result := list.assoc.remove("liq_cue_in", result())
-        duration = float_of_string(meta["duration"], default=0.0)
         if time_to_skip() >= duration then
           log(level=3, label=label, "Time to skip is greater than duration, skipping...")
           time_to_skip := time_to_skip() - duration
