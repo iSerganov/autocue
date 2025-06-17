@@ -70,23 +70,24 @@
 #                         possibly deliver outdated metadata to us.
 # 2024-08-05 Moonbase59 - v4.1.1 Fix JSON overriding if `liq_cue_file` is true
 # 2024-12-19 iSerganov  - v4.2.0 Liquidsoap 2.3.0 compatibility
+# 2025-06-16 iSerganov  - v4.2.1 Add `enforce_start_time` tag to enforce the start time of the track
 #
 # Originally based on an idea and some code by John Warburton (@Warblefly):
 #   https://github.com/Warblefly/TrackBoundaries
 # Some collaborative work with RM-FM (@RM-FM): Sustained ending analysis.
 
 __author__ = 'Matthias C. Hormann'
-__version__ = '4.2.0'
+__version__ = '4.2.1'
 
 import os
 import sys
-import tempfile
 import subprocess
 import argparse
 import json
 import re
 import math
 from pathlib import Path
+from datetime import datetime
 import textwrap
 
 # like print(), but prints to stderr
@@ -127,6 +128,13 @@ LONGTAIL_EXTRA_LU = -12.0  # reduce 15 dB extra on long tail songs to find overl
 SUSTAINED_LOUDNESS_DROP = 40.0  # max. percent drop to be considered sustained
 BLANKSKIP = 5.0  # min. seconds silence to detect blank
 NICE = False  # use Linux/MacOS nice?
+
+# Use this tag to enforce the start time of the track
+# If cue_file finds this tag it will fast forward to the current offset since the requested start time (if )
+# If too much time passed since the requested start time (more than the track duration), the track will be skipped
+# E.g. enforce_start_time="2025-06-16T17:30:01-04:00", current time is 2025-06-16T17:31:11-04:00, 
+# the script will produce liq_cue_in=70.0 to skip 70 seconds
+enforce_start_time = "enforce_start_time"
 
 # These file types can be handled correctly by ffmpeg
 safe_ext = [
@@ -859,8 +867,6 @@ def write_tags(filename, tags={}, replaygain=False):
 
     # Only write if "safe" file type and file is writable.
     if filename.suffix.casefold() in safe_ext and os.access(filename, os.W_OK):
-        # This doesn’t work cross-device!
-        # temp_file_handle, temp = tempfile.mkstemp(prefix="cue_file.", suffix=filename.suffix)
         # So we use the same folder, to be able to do an atomic move.
         temp = filename.with_suffix('.tmp' + filename.suffix)
         # eprint(temp)
@@ -1244,6 +1250,18 @@ if args.force or not skip_analysis:
 else:
     result = add_missing(tags_found, args.target, args.blankskip, args.noclip)
 
+# a custom logic to enforce the start time of the track
+# this is used to ensure that the track starts at a specific time
+if enforce_start_time in tags_found:
+    parsed_datetime = datetime.fromisoformat(tags_found[enforce_start_time])
+    result["liq_cue_in"] = tags_found[enforce_start_time]
+    diff = datetime.now() - parsed_datetime
+    if diff.total_seconds() > result["duration"]:
+        eprint(f"Too much time has passed since the requested start time, skipping the track. Requested start time: {tags_found[enforce_start_time]}, track duration: {result['duration']}, time passed: {diff.total_seconds()}")
+        result["liq_cue_in"] = result["duration"]
+    elif diff.total_seconds() > 0:
+        eprint(f"Enforcing start time: Requested start time: {tags_found[enforce_start_time]}, track duration: {result['duration']}, time passed: {diff.total_seconds()}")
+        result["liq_cue_in"] = diff.total_seconds()
 # eprint(result)
 
 if args.write:
