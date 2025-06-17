@@ -1250,6 +1250,7 @@ if args.force or not skip_analysis:
 else:
     result = add_missing(tags_found, args.target, args.blankskip, args.noclip)
 
+eprint(f"CUE_FILE found tags: {tags_found}")
 # a custom logic to enforce the start time of the track
 # this is used to ensure that the track starts at a specific time
 if enforce_start_time in tags_found:
@@ -1257,11 +1258,14 @@ if enforce_start_time in tags_found:
     now = datetime.now()
     diff = now - parsed_datetime
     eprint(f"Passed since requested start time: {diff.total_seconds()}, Parsed Enforce Start Time: {parsed_datetime}, Current time: {now}")
-    if diff.total_seconds() > result["duration"]:
+    if diff.total_seconds() > float(result["duration"]):
         eprint(f"Too much time has passed since the requested start time, skipping the track. Requested start time: {tags_found[enforce_start_time]}, track duration: {result['duration']}, time passed: {diff.total_seconds()}")
         result["liq_cue_in"] = result["duration"]
     elif diff.total_seconds() > 0:
         eprint(f"Enforcing start time: Requested start time: {tags_found[enforce_start_time]}, track duration: {result['duration']}, time passed: {diff.total_seconds()}")
+        result["liq_cue_in"] = diff.total_seconds()
+    else:
+        eprint(f"Not setting liq_cue_in Requested start time: {tags_found[enforce_start_time]}, track duration: {result['duration']}, time passed: {diff.total_seconds()}")
         result["liq_cue_in"] = diff.total_seconds()
 # eprint(result)
 
