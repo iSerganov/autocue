@@ -347,7 +347,7 @@ def read_tags(
             filename,
         ],
         stdout=subprocess.PIPE,
-        # stderr=subprocess.STDOUT,
+        stderr=subprocess.STDOUT,
         check=True,
         text=True).stdout
 
@@ -1254,8 +1254,9 @@ else:
 # this is used to ensure that the track starts at a specific time
 if enforce_start_time in tags_found:
     parsed_datetime = datetime.fromisoformat(tags_found[enforce_start_time])
-    result["liq_cue_in"] = tags_found[enforce_start_time]
-    diff = datetime.now() - parsed_datetime
+    now = datetime.now()
+    diff = now - parsed_datetime
+    eprint(f"Passed since requested start time: {diff.total_seconds()}, Parsed Enforce Start Time: {parsed_datetime}, Current time: {now}")
     if diff.total_seconds() > result["duration"]:
         eprint(f"Too much time has passed since the requested start time, skipping the track. Requested start time: {tags_found[enforce_start_time]}, track duration: {result['duration']}, time passed: {diff.total_seconds()}")
         result["liq_cue_in"] = result["duration"]
