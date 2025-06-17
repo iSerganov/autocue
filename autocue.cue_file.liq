@@ -579,22 +579,8 @@ def cue_file(~request_metadata, ~file_metadata, filename) =
     if list.assoc.mem("enforce_start_time", meta) then
       enforce_start_time = float_of_string(meta["enforce_start_time"], default=0.0)
       log(level=3, label=label, "Enforce start time found: #{enforce_start_time}")
-      if time_to_skip() > 0.0 then
+      if enforce_start_time > 0.0 then
         time_to_skip := time() - enforce_start_time
-      end
-    end
-
-    if time_to_skip() > 0.0 then
-      res := list.assoc.remove("liq_cue_in", res)
-      duration = float_of_string(meta["duration"], default=0.0)
-      if time_to_skip() > duration then
-        log(level=3, label=label, "Time to skip is greater than duration, skipping...")
-        time_to_skip := time_to_skip() - duration
-        res := list.add(("liq_cue_in", string.float(decimal_places=2, duration)), res)
-      else
-        log(level=3, label=label, "Time to skip is less than duration, setting liq_cue_in to: #{time_to_skip()}")
-        res := list.add(("liq_cue_in", string.float(decimal_places=2, time_to_skip())), res)
-        time_to_skip := 0.0
       end
     end
 
@@ -671,6 +657,21 @@ def cue_file(~request_metadata, ~file_metadata, filename) =
           ("liq_true_peak_db", liq_true_peak_db)
         ]
       )
+
+      # Check if we need to enforce the start time of the track
+      if time_to_skip() > 0.0 then
+        result := list.assoc.remove("liq_cue_in", result())
+        duration = float_of_string(meta["duration"], default=0.0)
+        if time_to_skip() >= duration then
+          log(level=3, label=label, "Time to skip is greater than duration, skipping...")
+          time_to_skip := time_to_skip() - duration
+          result := list.add(("liq_cue_in", string.float(decimal_places=2, duration)), result)
+        else
+          log(level=3, label=label, "Time to skip is less than duration, setting liq_cue_in to: #{time_to_skip()}")
+          result := list.add(("liq_cue_in", string.float(decimal_places=2, time_to_skip())), result)
+          time_to_skip := 0.0
+        end
+      end
 
       # `liq_cue_file` determines what happens now:
       #   tag absent - normal handling, existing metadata preferred
