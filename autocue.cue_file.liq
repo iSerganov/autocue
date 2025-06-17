@@ -51,6 +51,7 @@
 #                           - true = cue_file results override metadata
 # 2024-08-05 - Moonbase59 - v4.1.1 Sync with cue_file version
 # 2024-12-19 - iSerganov  - v4.2.0 Liquidsoap 2.3.0 compatibility
+# 2025-06-17 - iSerganov  - v4.2.1 Checking enforce_start_time tag and setting liq_cue_in accordingly
 
 # Lots of debugging output for AzuraCast in this, will be removed eventually.
 
@@ -64,7 +65,7 @@ let settings.autocue.cue_file.version =
   settings.make(
     description=
       "Software version of autocue.cue_file. Should coincide with `cue_file`.",
-    "4.2.0"
+    "4.2.1"
   )
 
 # Internal only! Not a user setting.
@@ -225,6 +226,8 @@ let settings.autocue.cue_file.ignored_overrides =
     ['duration']
   )
 
+
+time_to_skip = ref(0.0)
 stdlib_metadata = metadata
 
 # metadata.json.stringify only exports a limited set, use our own
@@ -571,6 +574,28 @@ def cue_file(~request_metadata, ~file_metadata, filename) =
       # remove tempfile again
       log(level=4, label=label, "Removing #{tempfile()}")
       file.remove(tempfile())
+    end
+
+    if list.assoc.mem("enforce_start_time", meta) then
+      enforce_start_time = float_of_string(meta["enforce_start_time"], default=0.0)
+      log(level=3, label=label, "Enforce start time found: #{enforce_start_time}")
+      if time_to_skip() > 0.0 then
+        time_to_skip := time() - enforce_start_time
+      end
+    end
+
+    if time_to_skip() > 0.0 then
+      res := list.assoc.remove("liq_cue_in", res)
+      duration = float_of_string(meta["duration"], default=0.0)
+      if time_to_skip() > duration then
+        log(level=3, label=label, "Time to skip is greater than duration, skipping...")
+        time_to_skip := time_to_skip() - duration
+        res := list.add(("liq_cue_in", string.float(decimal_places=2, duration)), res)
+      else
+        log(level=3, label=label, "Time to skip is less than duration, setting liq_cue_in to: #{time_to_skip()}")
+        res := list.add(("liq_cue_in", string.float(decimal_places=2, time_to_skip())), res)
+        time_to_skip := 0.0
+      end
     end
 
     if
